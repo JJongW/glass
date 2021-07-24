@@ -11,12 +11,12 @@ const StyledTextInput = styled.TextInput.attrs(({ theme }) => ({
     placeholderTextColor: theme.inputPlaceholder,
   }))`
     background-color: ${({ theme, editable }) =>
-      editable ? theme.background : theme.inputDisabledBackground};
+      editable ? theme.background1 : theme.inputDisabledBackground};
     color: ${({ theme, isFocused }) => (isFocused? theme.text2: theme.text1)};
     padding: 18px 25px;
     font-size: 16px;
     border: 0.5px solid
-      ${({ theme, isFocused }) => (isFocused ? theme.text : theme.inputBorder)};
+      ${({ theme, isFocused }) => (isFocused ? theme.inputBorder : theme.text)};
     border-radius: 30px;
   `;
   const Input = forwardRef(
@@ -30,6 +30,7 @@ const StyledTextInput = styled.TextInput.attrs(({ theme }) => ({
         isPassword,
         returnKeyType,
         maxLength,
+        disabled,
       },
       ref
     ) => {
@@ -56,6 +57,7 @@ const StyledTextInput = styled.TextInput.attrs(({ theme }) => ({
             autoCorrect={false}
             textContentType="none" // iOS only
             underlineColorAndroid="transparent" // Android only
+            editable={!disabled}
           />
         </Container>
       );
@@ -63,6 +65,8 @@ const StyledTextInput = styled.TextInput.attrs(({ theme }) => ({
   );
   Input.defaultProps = {
     onBlur: () => {},
+    onChangeText: ()=>{},
+    onSubmitEditing: ()=>{},
   };
   
   Input.propTypes = {
@@ -74,6 +78,7 @@ const StyledTextInput = styled.TextInput.attrs(({ theme }) => ({
     isPassword: PropTypes.bool,
     returnKeyType: PropTypes.oneOf(['done', 'next']),
     maxLength: PropTypes.number,
+    disabled: PropTypes.bool,
   };
   
   export default Input;

@@ -1,4 +1,4 @@
-import React,{useState, useRef} from 'react';
+import React,{useState, useRef, useContext} from 'react';
 import styled from 'styled-components/native';
 import { Text, View, TouchableWithoutFeedback, Keyboard, Alert} from 'react-native';
 import {Image, Input, Button} from '../components';
@@ -7,13 +7,14 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { validateEmail, removeWhitespace } from '../utils/common';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { login } from '../utils/firebase';
+import { ProgressContext, UserContext } from '../contexts';
 
 const Container = styled.View`
 flex: 1;
 background-color: ${({theme})=>theme.background};
 justify-content: center;
 padding: 0 20px;
-marginLeft: 20px;
+marginLeft: 20px; 
 marginRight: 20px;
 `;
 const ErrorText=styled.Text`
@@ -26,6 +27,8 @@ color: ${({theme})=>theme.errorText};
 `;
 
 const Login=({navigation})=>{
+    const {dispatch} =useContext(UserContext);
+    const {spinner} = useContext(ProgressContext);
     const insets = useSafeAreaInsets();
     const [email, setEmail]=useState('');
     const [password, setPassword]=useState('');
@@ -44,10 +47,13 @@ const Login=({navigation})=>{
     };
     const _handleLoginButtonPress=async()=>{
         try{
+            spinner.start();
             const user = await login({email,password});
-            Alert.alert('Login Success',user.email);
+            dispatch(user);
         }catch(e){
-            Alert.alert('Login Error',e.message);
+            Alert.alert('다시 로그인해주세요.',e.message);
+        }finally{
+            spinner.stop();
         }
     };
 

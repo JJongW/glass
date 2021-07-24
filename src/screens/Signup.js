@@ -1,10 +1,11 @@
-import React, { useState, useRef, useEffect} from 'react';
+import React, { useState, useRef, useEffect, useContext} from 'react';
 import styled from 'styled-components/native';
 import { Image, Input, Button } from '../components';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { validateEmail, removeWhitespace } from '../utils/common';
 import { View, Text, Alert } from 'react-native';
 import {signup} from '../utils/firebase';
+import { ProgressContext, UserContext} from '../contexts';
 
 const Container = styled.View`
   flex: 1;
@@ -24,6 +25,8 @@ const ErrorText = styled.Text`
 `;
 
 const Signup = () => {
+  const {dispatch} = useContext(UserContext);
+  const {spinner} = useContext(ProgressContext);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -63,11 +66,13 @@ const Signup = () => {
 
   const _handleSignupButtonPress = async()=>{
       try{
+        spinner.start();
           const user=await signup({email, password, name});
-          console.log(user);
-          Alert.alert('가입 성공했습니다.',user.email);
+          dispatch(user);
       } catch(e){
           Alert.alert('가입 오류입니다.',e.message);
+      } finally{
+        spinner.stop();
       }
   };
 
